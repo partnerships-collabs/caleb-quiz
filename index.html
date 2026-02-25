@@ -489,6 +489,41 @@
       color: var(--text);
     }
 
+    /* Trust pills */
+    .trust-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .trust-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(225, 253, 12, 0.08);
+      border: 1px solid rgba(225, 253, 12, 0.25);
+      color: var(--lime);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 99px;
+      letter-spacing: 0.02em;
+    }
+    .trust-pill::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--lime);
+      flex-shrink: 0;
+    }
+    @media (min-width: 600px) {
+      .trust-pills { justify-content: flex-start; }
+    }
+    @media (max-width: 599px) {
+      .trust-pills { justify-content: center; }
+    }
+
     .hidden { display: none !important; }
 
     @media (max-width: 480px) {
@@ -520,6 +555,11 @@
       <div class="hero-copy">
         <h1>Find Your <span>Perfect</span> Credit Card</h1>
         <p>Six questions. No fluff. Get a card recommendation based on your actual financial situation.</p>
+        <div class="trust-pills">
+          <span class="trust-pill">No email required</span>
+          <span class="trust-pill">No sign-up</span>
+          <span class="trust-pill">Results in 60 seconds</span>
+        </div>
       </div>
     </div>
 
