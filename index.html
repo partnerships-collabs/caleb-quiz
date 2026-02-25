@@ -9,152 +9,211 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --green: #37ca37;
       --lime: #e1fd0c;
-      --dark: #0d0d0d;
-      --dark2: #1a1a1a;
-      --dark3: #252525;
-      --card-bg: #1e1e1e;
-      --border: #2e2e2e;
-      --text: #f0f0f0;
-      --muted: #888;
+      --lime-dim: #c8e20a;
+      --green: #37ca37;
+      --dark: #080c0a;
+      --dark2: #101410;
+      --dark3: #181c18;
+      --card-bg: #141814;
+      --border: #252a25;
+      --border-light: #2e352e;
+      --text: #e8ede8;
+      --muted: #7a887a;
       --white: #ffffff;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html { scroll-behavior: smooth; }
+
     body {
-      background-color: var(--dark);
+      background: linear-gradient(160deg, #050a06 0%, #080c08 40%, #0a0e08 100%);
+      background-attachment: fixed;
       color: var(--text);
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
 
     /* Header */
     .header {
       width: 100%;
-      background: var(--dark2);
+      background: rgba(8, 12, 8, 0.9);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
-      padding: 20px 24px;
+      padding: 16px 24px;
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
     .header img {
-      width: 52px;
-      height: 52px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid var(--green);
+      border: 2px solid var(--lime);
     }
-    .header-text {}
     .header-name {
       font-family: 'Inter Tight', sans-serif;
       font-weight: 800;
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: var(--white);
       letter-spacing: -0.02em;
     }
     .header-tag {
-      font-size: 0.78rem;
-      color: var(--green);
-      font-weight: 500;
+      font-size: 0.72rem;
+      color: var(--lime);
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
     }
 
-    /* Main container */
-    .container {
-      width: 100%;
-      max-width: 680px;
-      padding: 40px 24px 80px;
+    /* Page wrapper */
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 48px 20px 80px;
     }
 
-    /* Hero section */
+    /* Hero */
     .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 48px;
+      gap: 24px;
     }
     .hero-photo {
-      width: 120px;
-      height: 120px;
+      width: 108px;
+      height: 108px;
       border-radius: 50%;
       object-fit: cover;
-      border: 3px solid var(--green);
-      margin-bottom: 20px;
-      box-shadow: 0 0 32px rgba(55, 202, 55, 0.25);
+      border: 3px solid var(--lime);
+      box-shadow: 0 0 40px rgba(225, 253, 12, 0.2);
+      flex-shrink: 0;
     }
+    .hero-copy {}
     .hero h1 {
       font-family: 'Inter Tight', sans-serif;
       font-weight: 900;
-      font-size: 2.2rem;
-      line-height: 1.1;
-      letter-spacing: -0.03em;
+      font-size: 2.6rem;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
       color: var(--white);
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
     .hero h1 span {
-      color: var(--green);
+      color: var(--lime);
     }
     .hero p {
       font-size: 1rem;
       color: var(--muted);
+      line-height: 1.65;
       max-width: 480px;
       margin: 0 auto;
-      line-height: 1.6;
     }
 
-    /* Progress bar */
-    .progress-wrap {
-      margin-bottom: 36px;
+    @media (min-width: 600px) {
+      .hero {
+        flex-direction: row;
+        text-align: left;
+        align-items: center;
+      }
+      .hero p {
+        margin: 0;
+      }
     }
-    .progress-label {
+
+    /* Step indicators */
+    .steps {
       display: flex;
-      justify-content: space-between;
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-bottom: 8px;
-      font-weight: 500;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 32px;
     }
-    .progress-bar {
-      height: 4px;
-      background: var(--border);
-      border-radius: 99px;
+    .step-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--dark3);
+      border: 2px solid var(--border-light);
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter Tight', sans-serif;
+      transition: all 0.25s ease;
+      position: relative;
+      z-index: 1;
+    }
+    .step-dot.active {
+      background: var(--lime);
+      border-color: var(--lime);
+      color: #000;
+      box-shadow: 0 0 16px rgba(225, 253, 12, 0.4);
+    }
+    .step-dot.done {
+      background: rgba(225, 253, 12, 0.15);
+      border-color: var(--lime);
+      color: var(--lime);
+    }
+    .step-line {
+      height: 2px;
+      width: 32px;
+      background: var(--border-light);
+      transition: background 0.25s ease;
+    }
+    .step-line.done {
+      background: var(--lime);
+    }
+
+    /* Quiz card */
+    .quiz-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 36px;
       overflow: hidden;
     }
-    .progress-fill {
-      height: 100%;
-      background: var(--green);
-      border-radius: 99px;
-      transition: width 0.4s ease;
+
+    .q-slide {
+      animation: slideIn 0.28s ease forwards;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(24px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .q-slide-back {
+      animation: slideInBack 0.28s ease forwards;
+    }
+    @keyframes slideInBack {
+      from { opacity: 0; transform: translateX(-24px); }
+      to   { opacity: 1; transform: translateX(0); }
     }
 
-    /* Question card */
-    .question-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 32px;
-    }
-    .question-number {
-      font-size: 0.78rem;
-      color: var(--green);
+    .q-number {
+      font-size: 0.72rem;
+      color: var(--lime);
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 12px;
+      letter-spacing: 0.12em;
+      margin-bottom: 10px;
     }
-    .question-text {
+    .q-text {
       font-family: 'Inter Tight', sans-serif;
-      font-weight: 700;
-      font-size: 1.35rem;
-      line-height: 1.3;
+      font-weight: 800;
+      font-size: 1.4rem;
+      line-height: 1.25;
       color: var(--white);
-      margin-bottom: 24px;
-      letter-spacing: -0.02em;
+      margin-bottom: 28px;
+      letter-spacing: -0.025em;
     }
 
     /* Options */
@@ -165,55 +224,61 @@
     }
     .option {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: 14px;
-      padding: 16px 18px;
+      padding: 15px 18px;
       background: var(--dark3);
-      border: 1.5px solid var(--border);
+      border: 1.5px solid var(--border-light);
       border-radius: 12px;
       cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      user-select: none;
     }
     .option:hover {
-      border-color: var(--green);
-      background: rgba(55, 202, 55, 0.06);
+      border-color: var(--lime);
+      background: rgba(225, 253, 12, 0.05);
+      transform: translateY(-1px);
+    }
+    .option:active {
+      transform: translateY(0);
     }
     .option.selected {
-      border-color: var(--green);
-      background: rgba(55, 202, 55, 0.1);
+      border-color: var(--lime);
+      background: var(--lime);
     }
-    .option-dot {
-      width: 20px;
-      height: 20px;
+    .option-check {
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
       border: 2px solid var(--muted);
       flex-shrink: 0;
-      margin-top: 2px;
-      transition: border-color 0.15s, background 0.15s;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: all 0.15s;
     }
-    .option.selected .option-dot {
-      border-color: var(--green);
-      background: var(--green);
+    .option.selected .option-check {
+      background: #000;
+      border-color: #000;
     }
-    .option.selected .option-dot::after {
+    .option.selected .option-check::after {
       content: '';
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--dark);
+      width: 9px;
+      height: 6px;
+      border-left: 2.5px solid var(--lime);
+      border-bottom: 2.5px solid var(--lime);
+      transform: rotate(-45deg) translateY(-1px);
+      display: block;
     }
     .option-label {
-      font-size: 0.97rem;
+      font-size: 0.96rem;
       color: var(--text);
       line-height: 1.5;
       font-weight: 400;
     }
     .option.selected .option-label {
-      color: var(--white);
-      font-weight: 500;
+      color: #000;
+      font-weight: 600;
     }
 
     /* Navigation */
@@ -225,11 +290,11 @@
     }
     .btn-back {
       background: none;
-      border: 1.5px solid var(--border);
+      border: 1.5px solid var(--border-light);
       color: var(--muted);
-      padding: 12px 22px;
+      padding: 12px 20px;
       border-radius: 10px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-family: 'Inter', sans-serif;
       font-weight: 500;
       cursor: pointer;
@@ -240,133 +305,175 @@
       color: var(--text);
     }
     .btn-next {
-      background: var(--green);
+      background: var(--lime);
       border: none;
       color: #000;
-      padding: 12px 28px;
+      padding: 13px 30px;
       border-radius: 10px;
       font-size: 0.95rem;
       font-family: 'Inter Tight', sans-serif;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
       letter-spacing: -0.01em;
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
     }
     .btn-next:hover {
-      background: #42df42;
-      transform: translateY(-1px);
+      background: #eeff1a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(225, 253, 12, 0.3);
+    }
+    .btn-next:active {
+      transform: translateY(0);
     }
     .btn-next:disabled {
-      background: var(--border);
+      background: var(--border-light);
       color: var(--muted);
       cursor: not-allowed;
       transform: none;
+      box-shadow: none;
     }
 
     /* Result screen */
-    .result-screen {
-      display: none;
+    .result-hero {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .result-photo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2.5px solid var(--lime);
+      margin-bottom: 20px;
     }
     .result-badge {
-      display: inline-block;
-      background: rgba(55, 202, 55, 0.12);
-      border: 1px solid var(--green);
-      color: var(--green);
-      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(225, 253, 12, 0.1);
+      border: 1px solid rgba(225, 253, 12, 0.35);
+      color: var(--lime);
+      font-size: 0.72rem;
       font-weight: 700;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       padding: 6px 14px;
       border-radius: 99px;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+    }
+    .result-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--lime);
+      flex-shrink: 0;
     }
     .result-card-name {
       font-family: 'Inter Tight', sans-serif;
       font-weight: 900;
-      font-size: 2rem;
-      line-height: 1.1;
-      letter-spacing: -0.03em;
+      font-size: 2.4rem;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
       color: var(--white);
       margin-bottom: 8px;
     }
     .result-card-type {
       font-size: 0.9rem;
-      color: var(--green);
+      color: var(--lime);
       font-weight: 600;
-      margin-bottom: 24px;
+      letter-spacing: 0.02em;
     }
-    .result-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 28px;
-      margin-bottom: 20px;
-    }
-    .result-card h3 {
-      font-family: 'Inter Tight', sans-serif;
-      font-weight: 700;
-      font-size: 1rem;
-      color: var(--white);
-      margin-bottom: 12px;
-      letter-spacing: -0.01em;
-    }
-    .result-card ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .result-card ul li {
-      font-size: 0.92rem;
-      color: var(--muted);
-      line-height: 1.5;
-      padding-left: 20px;
-      position: relative;
-    }
-    .result-card ul li::before {
-      content: '→';
-      color: var(--green);
-      position: absolute;
-      left: 0;
-      font-weight: 700;
-    }
+
+    /* Caleb's take */
     .caleb-take {
-      background: rgba(225, 253, 12, 0.06);
-      border: 1px solid rgba(225, 253, 12, 0.25);
-      border-radius: 14px;
-      padding: 20px 24px;
-      margin-bottom: 28px;
+      background: rgba(225, 253, 12, 0.05);
+      border: 1px solid rgba(225, 253, 12, 0.2);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 20px;
     }
     .caleb-take-header {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     .caleb-take-header img {
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       object-fit: cover;
       border: 1.5px solid var(--lime);
     }
-    .caleb-take-header span {
+    .caleb-take-name {
       font-family: 'Inter Tight', sans-serif;
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--lime);
       letter-spacing: 0.02em;
     }
     .caleb-take p {
-      font-size: 0.93rem;
-      color: #ccc;
-      line-height: 1.65;
+      font-size: 0.94rem;
+      color: #b8c8b8;
+      line-height: 1.7;
     }
+
+    /* Info cards */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    @media (min-width: 580px) {
+      .info-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .info-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 22px;
+    }
+    .info-card h3 {
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: var(--lime);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 14px;
+    }
+    .info-card ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .info-card ul li {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.55;
+      padding-left: 18px;
+      position: relative;
+    }
+    .info-card ul li::before {
+      content: '+';
+      color: var(--lime);
+      position: absolute;
+      left: 0;
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* Restart */
     .btn-restart {
       display: block;
       width: 100%;
       background: var(--dark3);
-      border: 1.5px solid var(--border);
+      border: 1.5px solid var(--border-light);
       color: var(--muted);
       padding: 14px;
       border-radius: 12px;
@@ -382,13 +489,15 @@
       color: var(--text);
     }
 
-    /* Hidden */
     .hidden { display: none !important; }
 
-    @media (max-width: 500px) {
-      .hero h1 { font-size: 1.7rem; }
-      .question-card { padding: 24px 18px; }
-      .question-text { font-size: 1.15rem; }
+    @media (max-width: 480px) {
+      .page { padding: 32px 16px 60px; }
+      .hero h1 { font-size: 2rem; }
+      .quiz-card { padding: 24px 18px; }
+      .q-text { font-size: 1.2rem; }
+      .result-card-name { font-size: 1.9rem; }
+      .step-line { width: 20px; }
     }
   </style>
 </head>
@@ -396,36 +505,32 @@
 
 <header class="header">
   <img src="caleb.jpg" alt="Caleb Hammer" />
-  <div class="header-text">
+  <div>
     <div class="header-name">Caleb Hammer</div>
     <div class="header-tag">Financial Audit</div>
   </div>
 </header>
 
-<div class="container">
+<div class="page">
 
-  <!-- Quiz screen -->
+  <!-- QUIZ SCREEN -->
   <div id="quiz-screen">
     <div class="hero">
       <img src="caleb.jpg" alt="Caleb Hammer" class="hero-photo" />
-      <h1>Find Your <span>Perfect</span><br />Credit Card</h1>
-      <p>Six questions. No fluff. Get a personalized recommendation based on your actual financial situation.</p>
-    </div>
-
-    <div class="progress-wrap">
-      <div class="progress-label">
-        <span id="q-label">Question 1 of 6</span>
-        <span id="q-pct">0%</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+      <div class="hero-copy">
+        <h1>Find Your <span>Perfect</span> Credit Card</h1>
+        <p>Six questions. No fluff. Get a card recommendation based on your actual financial situation.</p>
       </div>
     </div>
 
-    <div class="question-card">
-      <div class="question-number" id="q-number">Question 1</div>
-      <div class="question-text" id="q-text"></div>
-      <div class="options" id="q-options"></div>
+    <div class="steps" id="steps-wrap"></div>
+
+    <div class="quiz-card">
+      <div id="q-inner">
+        <div class="q-number" id="q-number">Question 1</div>
+        <div class="q-text" id="q-text"></div>
+        <div class="options" id="q-options"></div>
+      </div>
       <div class="nav">
         <button class="btn-back" id="btn-back" onclick="prevQ()">Back</button>
         <button class="btn-next" id="btn-next" onclick="nextQ()" disabled>Next</button>
@@ -433,11 +538,11 @@
     </div>
   </div>
 
-  <!-- Result screen -->
+  <!-- RESULT SCREEN -->
   <div id="result-screen" class="hidden">
-    <div class="hero" style="margin-bottom: 28px;">
-      <img src="caleb.jpg" alt="Caleb Hammer" class="hero-photo" />
-      <div class="result-badge">Your Match</div>
+    <div class="result-hero">
+      <img src="caleb.jpg" alt="Caleb Hammer" class="result-photo" />
+      <div><div class="result-badge">Your Match</div></div>
       <div class="result-card-name" id="res-name"></div>
       <div class="result-card-type" id="res-type"></div>
     </div>
@@ -445,19 +550,20 @@
     <div class="caleb-take">
       <div class="caleb-take-header">
         <img src="caleb.jpg" alt="Caleb" />
-        <span>Caleb's Take</span>
+        <span class="caleb-take-name">Caleb's Take</span>
       </div>
       <p id="res-take"></p>
     </div>
 
-    <div class="result-card">
-      <h3>Why this card fits you</h3>
-      <ul id="res-reasons"></ul>
-    </div>
-
-    <div class="result-card">
-      <h3>What to know before you apply</h3>
-      <ul id="res-notes"></ul>
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>Why it fits you</h3>
+        <ul id="res-reasons"></ul>
+      </div>
+      <div class="info-card">
+        <h3>Before you apply</h3>
+        <ul id="res-notes"></ul>
+      </div>
     </div>
 
     <button class="btn-restart" onclick="restart()">Start over</button>
@@ -533,29 +639,29 @@
     secured: {
       name: 'Discover it Secured',
       type: 'Credit Builder Card',
-      take: "Starting with a secured card is the right call when you have no credit history or you've had issues in the past. Discover it Secured is one of the best in class because it automatically reviews your account after 7 months and upgrades you to an unsecured card if you qualify. Do not blow this opportunity. Pay it in full every single month.",
+      take: "Starting with a secured card is the right call when you have no credit history or you have had issues in the past. Discover it Secured is one of the best in class because it automatically reviews your account after 7 months and upgrades you to an unsecured card if you qualify. Do not blow this opportunity. Pay it in full every single month.",
       reasons: [
         'No credit history or rebuilding from scratch',
-        'Earn 2% cashback at gas stations and restaurants, 1% on everything else',
+        'Earn 2% cashback at gas stations and restaurants',
         'No annual fee and no minimum credit score required',
         'Discover matches all cashback earned in your first year'
       ],
       notes: [
         'Requires a refundable security deposit (typically $200 minimum)',
         'Your deposit becomes your credit limit',
-        'Automatic upgrade review at 7 months of on-time payments',
+        'Automatic upgrade review after 7 months of on-time payments',
         'Keep utilization under 30% to build your score fastest'
       ]
     },
     student: {
       name: 'Discover it Student',
       type: 'Student Cashback Card',
-      take: "If you're a student, this is one of the cleanest starter cards out there. No annual fee, real cashback, and Discover does the first-year match which is essentially free money. The only rule is pay it off every month. I don't care that you're in college. No balance carrying allowed.",
+      take: "If you are a student, this is one of the cleanest starter cards out there. No annual fee, real cashback, and Discover does the first-year match which is essentially free money. The only rule is pay it off every month. I do not care that you are in college. No balance carrying allowed.",
       reasons: [
         'Designed for students with limited or no credit history',
         '5% cashback on rotating quarterly categories, 1% on everything else',
         'Discover matches all cashback earned after your first year',
-        'Good Grades Reward of $20 statement credit each year your GPA is 3.0 or higher'
+        '$20 statement credit each year your GPA is 3.0 or higher'
       ],
       notes: [
         'No annual fee',
@@ -567,18 +673,18 @@
     transfer: {
       name: 'Wells Fargo Reflect',
       type: 'Balance Transfer Card',
-      take: "If you're carrying a balance right now, stop thinking about rewards and start thinking about eliminating that debt. The Wells Fargo Reflect gives you up to 21 months at 0% APR on balance transfers. That is your runway. Use it. Pay as much as you possibly can every month and do not add new charges.",
+      take: "If you are carrying a balance right now, stop thinking about rewards and start thinking about eliminating that debt. The Wells Fargo Reflect gives you up to 21 months at 0% APR on balance transfers. That is your runway. Use it. Pay as much as you possibly can every month and do not add new charges.",
       reasons: [
         'Up to 21 months 0% intro APR on qualifying balance transfers',
         '0% intro APR on purchases for the same period',
-        'Gives you breathing room to eliminate existing high-interest debt',
+        'Gives you breathing room to eliminate high-interest debt',
         'No annual fee'
       ],
       notes: [
         'Balance transfer fee applies, typically 3 to 5 percent',
         'The 0% period ends, so have a payoff plan before you apply',
         'Do not use this card for new purchases while paying down the transfer',
-        'Make every minimum payment on time or you lose the promotional rate'
+        'Missing a payment may cost you the promotional rate'
       ]
     },
     fizz: {
@@ -593,7 +699,7 @@
       ],
       notes: [
         'Subscription fee applies, currently around $8 per month',
-        'Not a traditional credit card, so rewards are limited',
+        'Not a traditional credit card so rewards are limited',
         'Requires a linked checking account with sufficient funds',
         'After 12 months of on-time history, reassess your credit score'
       ]
@@ -603,7 +709,7 @@
       type: 'Flat-Rate Cashback Card',
       take: "The Double Cash is boring and that is exactly why I like it. Two percent back on everything with no categories to track, no annual fee, and no games. If you pay your balance in full every month, you are essentially getting a 2% discount on your entire life. Simple. Clean. Effective.",
       reasons: [
-        '2% cashback on all purchases, 1% when you buy and 1% when you pay',
+        '2% cashback on all purchases with no category restrictions',
         'No annual fee',
         'No rotating categories or activation required',
         'Works well as a primary card for people who want simplicity'
@@ -611,8 +717,8 @@
       notes: [
         'Requires good to excellent credit to qualify',
         'Best value only if you pay in full every month',
-        'No welcome bonus compared to some competitors',
-        'Pair it with a travel card later once your credit improves'
+        'No large welcome bonus compared to some competitors',
+        'Pair it with a travel card later once your credit grows'
       ]
     },
     cashback_cat: {
@@ -620,7 +726,7 @@
       type: 'Category Cashback Card',
       take: "If you spend heavily in specific categories like gas and groceries, the Freedom Flex will earn you more than a flat-rate card. Five percent on rotating categories, three percent on dining and drugstores, and one percent on everything else. You do have to activate the quarterly categories but it takes two minutes and it is worth it.",
       reasons: [
-        '5% cashback on rotating quarterly categories, up to $1,500 per quarter',
+        '5% cashback on rotating quarterly categories up to $1,500',
         '3% on dining and drugstores, 1% on everything else',
         'No annual fee',
         'Strong welcome bonus typically $200 after spending $500 in three months'
@@ -637,14 +743,14 @@
       type: 'Travel Rewards Card',
       take: "The Sapphire Preferred is the best entry-level travel card on the market right now. The welcome bonus alone usually covers the annual fee for two to three years. Five points per dollar on travel booked through Chase, three on dining, and solid transfer partners mean your points actually go somewhere. Pay it in full. Every month. No exceptions.",
       reasons: [
-        '5x points on travel through Chase, 3x on dining and streaming',
+        '5x points on Chase Travel, 3x on dining and streaming',
         'Points transfer to major airlines and hotel programs',
         'Trip delay, cancellation, and primary rental car insurance included',
-        '$95 annual fee is easily offset by the welcome bonus and perks'
+        '$95 annual fee easily offset by the welcome bonus and perks'
       ],
       notes: [
         'Requires good to excellent credit, typically 700 or above',
-        'Best value when you use Chase transfer partners rather than redeeming for cash',
+        'Best value when using Chase transfer partners rather than redeeming for cash',
         'Welcome bonus typically 60,000 points after spending $4,000 in three months',
         'Upgrade to Sapphire Reserve later if you want premium lounge access'
       ]
@@ -662,8 +768,8 @@
       notes: [
         '$550 annual fee, only worth it if you travel frequently',
         'Requires excellent credit, typically 720 or above',
-        'Calculate your actual usage before applying: $300 credit + lounge value + points',
-        'Not a starter card. Get the Preferred first if you are new to travel rewards'
+        'Calculate your actual usage: $300 credit + lounge value + points earned',
+        'Not a starter card. Get the Preferred first if new to travel rewards'
       ]
     }
   };
@@ -671,6 +777,7 @@
   let current = 0;
   let answers = {};
   let selected = null;
+  let direction = 'forward';
 
   function getCard(a) {
     const scores = {
@@ -678,60 +785,72 @@
       cashback: 0, cashback_cat: 0, travel: 0, premium: 0
     };
 
-    // Q1: credit history
     if (a.history === 'new')         { scores.secured += 4; scores.fizz += 1; }
     if (a.history === 'student')     { scores.student += 5; scores.cashback += 1; }
     if (a.history === 'mid')         { scores.cashback += 2; scores.cashback_cat += 2; scores.travel += 1; }
     if (a.history === 'established') { scores.travel += 2; scores.premium += 2; scores.cashback += 1; }
 
-    // Q2: credit score
     if (a.score === 'excellent') { scores.premium += 3; scores.travel += 2; scores.cashback += 1; }
     if (a.score === 'good')      { scores.cashback += 2; scores.cashback_cat += 2; scores.travel += 1; }
     if (a.score === 'fair')      { scores.secured += 3; scores.fizz += 1; }
     if (a.score === 'poor')      { scores.fizz += 4; scores.secured += 1; }
 
-    // Q3: pay in full
     if (a.payoff === 'yes')       { scores.travel += 2; scores.premium += 2; scores.cashback += 2; scores.cashback_cat += 1; }
     if (a.payoff === 'sometimes') { scores.cashback += 2; scores.cashback_cat += 1; }
     if (a.payoff === 'carry')     { scores.transfer += 5; }
     if (a.payoff === 'new-payoff'){ scores.secured += 2; scores.student += 1; }
 
-    // Q4: primary goal
     if (a.goal === 'travel')   { scores.travel += 3; scores.premium += 1; }
     if (a.goal === 'cashback') { scores.cashback += 3; scores.cashback_cat += 2; }
     if (a.goal === 'build')    { scores.secured += 3; scores.student += 2; scores.fizz += 1; }
     if (a.goal === 'debt')     { scores.transfer += 5; }
 
-    // Q5: spending pattern
     if (a.spending === 'travel')     { scores.travel += 3; scores.premium += 2; }
     if (a.spending === 'everyday')   { scores.cashback_cat += 3; scores.cashback += 2; }
     if (a.spending === 'everything') { scores.cashback += 3; }
     if (a.spending === 'bills')      { scores.cashback += 1; scores.transfer += 1; }
 
-    // Q6: annual fee
     if (a.fee === 'premium-yes')  { scores.premium += 4; scores.travel += 1; }
     if (a.fee === 'cashback-yes') { scores.cashback += 2; scores.cashback_cat += 1; }
     if (a.fee === 'no')           { scores.cashback += 2; scores.cashback_cat += 1; scores.premium -= 2; scores.travel -= 1; }
     if (a.fee === 'unsure')       { scores.cashback += 1; scores.cashback_cat += 1; }
 
-    // Floor at 0
     Object.keys(scores).forEach(k => { if (scores[k] < 0) scores[k] = 0; });
 
-    // Override rules
     if (a.payoff === 'carry' || a.goal === 'debt') return 'transfer';
     if (a.score === 'poor' || (a.score === 'fair' && a.history === 'new')) return 'fizz';
 
     return Object.keys(scores).reduce((a, b) => scores[a] >= scores[b] ? a : b);
   }
 
-  function render() {
+  function renderSteps() {
+    const wrap = document.getElementById('steps-wrap');
+    wrap.innerHTML = '';
+    questions.forEach((q, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'step-dot' + (i === current ? ' active' : (i < current ? ' done' : ''));
+      dot.textContent = i < current ? '✓' : (i + 1);
+      if (i < current) dot.textContent = '✓';
+      wrap.appendChild(dot);
+      if (i < questions.length - 1) {
+        const line = document.createElement('div');
+        line.className = 'step-line' + (i < current ? ' done' : '');
+        wrap.appendChild(line);
+      }
+    });
+  }
+
+  function render(dir) {
     const q = questions[current];
     selected = answers[q.id] || null;
 
-    document.getElementById('q-label').textContent = `Question ${current + 1} of ${questions.length}`;
-    document.getElementById('q-pct').textContent = `${Math.round((current / questions.length) * 100)}%`;
-    document.getElementById('progress-fill').style.width = `${(current / questions.length) * 100}%`;
-    document.getElementById('q-number').textContent = `Question ${current + 1}`;
+    renderSteps();
+
+    const inner = document.getElementById('q-inner');
+    inner.className = dir === 'back' ? 'q-slide-back' : 'q-slide';
+    void inner.offsetWidth;
+
+    document.getElementById('q-number').textContent = `Question ${current + 1} of ${questions.length}`;
     document.getElementById('q-text').textContent = q.text;
 
     const optionsEl = document.getElementById('q-options');
@@ -739,7 +858,7 @@
     q.options.forEach(opt => {
       const div = document.createElement('div');
       div.className = 'option' + (selected === opt.value ? ' selected' : '');
-      div.innerHTML = `<div class="option-dot"></div><div class="option-label">${opt.label}</div>`;
+      div.innerHTML = `<div class="option-check"></div><div class="option-label">${opt.label}</div>`;
       div.addEventListener('click', () => selectOption(opt.value));
       optionsEl.appendChild(div);
     });
@@ -764,8 +883,7 @@
     answers[questions[current].id] = selected;
     if (current < questions.length - 1) {
       current++;
-      selected = answers[questions[current].id] || null;
-      render();
+      render('forward');
     } else {
       showResult();
     }
@@ -774,8 +892,7 @@
   function prevQ() {
     if (current > 0) {
       current--;
-      selected = answers[questions[current].id] || null;
-      render();
+      render('back');
     }
   }
 
@@ -786,12 +903,8 @@
     document.getElementById('res-name').textContent = card.name;
     document.getElementById('res-type').textContent = card.type;
     document.getElementById('res-take').textContent = card.take;
-
-    const reasonsEl = document.getElementById('res-reasons');
-    reasonsEl.innerHTML = card.reasons.map(r => `<li>${r}</li>`).join('');
-
-    const notesEl = document.getElementById('res-notes');
-    notesEl.innerHTML = card.notes.map(n => `<li>${n}</li>`).join('');
+    document.getElementById('res-reasons').innerHTML = card.reasons.map(r => `<li>${r}</li>`).join('');
+    document.getElementById('res-notes').innerHTML = card.notes.map(n => `<li>${n}</li>`).join('');
 
     document.getElementById('quiz-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
@@ -804,11 +917,11 @@
     selected = null;
     document.getElementById('result-screen').classList.add('hidden');
     document.getElementById('quiz-screen').classList.remove('hidden');
-    render();
+    render('forward');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  render();
+  render('forward');
 </script>
 </body>
 </html>
