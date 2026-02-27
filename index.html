@@ -616,6 +616,14 @@
 <script>
   const questions = [
     {
+      id: 'cardtype',
+      text: "Are you looking for a personal or business credit card?",
+      options: [
+        { label: "Personal card for my own everyday spending", value: 'personal' },
+        { label: "Business card for my company or self-employment income", value: 'business' }
+      ]
+    },
+    {
       id: 'history',
       text: "What best describes your credit situation?",
       options: [
@@ -678,6 +686,23 @@
   ];
 
   const cards = {
+    business: {
+      name: 'Chase Ink Business Preferred',
+      type: 'Business Rewards Card',
+      take: "For most business owners, the Ink Business Preferred is the right starting point. Three points per dollar on travel, advertising, shipping, and phone and internet bills covers where most businesses actually spend money. The welcome bonus is substantial and the $95 annual fee disappears against even modest business travel. If your business runs heavy on pure expenses and you want straight cashback instead of points, look at the Capital One Spark Cash Plus at the same time.",
+      reasons: [
+        '3x points on travel, shipping, internet, cable, phone, and social and search advertising up to $150,000 per year',
+        'Points transfer to 14 Chase airline and hotel partners',
+        'Cell phone protection up to $1,000 per claim when you pay your bill with the card',
+        '$95 annual fee with a strong welcome bonus that offsets it for years'
+      ],
+      notes: [
+        'Requires good to excellent business or personal credit',
+        'Best value when using Chase transfer partners rather than redeeming for cash',
+        'Pair with the Ink Business Unlimited for flat cashback on purchases outside the bonus categories',
+        'Capital One Spark Cash Plus is the better pick if your priority is pure flat-rate cashback over points'
+      ]
+    },
     secured: {
       name: 'Discover it Secured',
       type: 'Credit Builder Card',
@@ -821,7 +846,13 @@
   let selected = null;
   let direction = 'forward';
 
+  // Business path: if cardtype is business and credit isn't poor, skip straight to business result
+  function isBusiness(a) {
+    return a.cardtype === 'business' && a.score !== 'poor';
+  }
+
   function getCard(a) {
+    if (isBusiness(a)) return 'business';
     const scores = {
       secured: 0, student: 0, transfer: 0, fizz: 0,
       cashback: 0, cashback_cat: 0, travel: 0, premium: 0
@@ -923,6 +954,20 @@
   function nextQ() {
     if (!selected) return;
     answers[questions[current].id] = selected;
+
+    // Business path: after answering score, short-circuit to result (skip remaining questions)
+    if (answers.cardtype === 'business' && questions[current].id === 'score') {
+      showResult();
+      return;
+    }
+
+    // Business path: after cardtype=business, skip history and jump straight to score question
+    if (questions[current].id === 'cardtype' && selected === 'business') {
+      current = questions.findIndex(q => q.id === 'score');
+      render('forward');
+      return;
+    }
+
     if (current < questions.length - 1) {
       current++;
       render('forward');
@@ -933,7 +978,12 @@
 
   function prevQ() {
     if (current > 0) {
-      current--;
+      // Business path: going back from score should return to cardtype, not history
+      if (answers.cardtype === 'business' && questions[current].id === 'score') {
+        current = questions.findIndex(q => q.id === 'cardtype');
+      } else {
+        current--;
+      }
       render('back');
     }
   }
