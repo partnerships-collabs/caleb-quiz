@@ -537,7 +537,7 @@
     }
     .progress-fill {
       height: 100%;
-      background: var(--accent);
+      background: var(--lime);
       border-radius: 99px;
       transition: width 0.35s ease;
       min-width: 8%;
@@ -843,6 +843,42 @@
       ]
     }
   };
+
+  function getCard(a) {
+    if (a.cardtype === 'business' && a.score !== 'poor' && a.score !== 'new') return 'business';
+    if (a.payoff === 'carry') return 'transfer';
+    if (a.score === 'poor' || a.score === 'new') return 'fizz';
+    if (a.goal === 'build') return 'secured';
+
+    const scores = {
+      secured: 0, student: 0, transfer: 0, fizz: 0,
+      cashback: 0, cashback_cat: 0, travel: 0, premium: 0
+    };
+
+    if (a.score === 'new')       { scores.secured += 4; scores.fizz += 2; }
+    if (a.score === 'excellent') { scores.premium += 3; scores.travel += 1; scores.cashback += 1; }
+    if (a.score === 'good')      { scores.cashback += 2; scores.cashback_cat += 2; scores.travel += 1; }
+    if (a.score === 'fair')      { scores.secured += 3; scores.fizz += 1; }
+    if (a.score === 'poor')      { scores.fizz += 4; scores.secured += 1; }
+
+    if (a.payoff === 'yes')       { scores.travel += 2; scores.premium += 2; scores.cashback += 2; scores.cashback_cat += 1; }
+    if (a.payoff === 'sometimes') { scores.cashback += 2; scores.cashback_cat += 1; }
+
+    if (a.goal === 'travel')   { scores.travel += 3; scores.premium += 1; }
+    if (a.goal === 'cashback') { scores.cashback += 3; scores.cashback_cat += 2; }
+
+    if (a.spending === 'travel')     { scores.travel += 3; scores.premium += 2; }
+    if (a.spending === 'everyday')   { scores.cashback_cat += 3; scores.cashback += 2; }
+    if (a.spending === 'everything') { scores.cashback += 3; }
+    if (a.spending === 'bills')      { scores.cashback += 1; }
+
+    if (a.fee === 'premium-yes')  { scores.premium += 4; scores.travel += 1; }
+    if (a.fee === 'cashback-yes') { scores.cashback += 2; scores.cashback_cat += 1; }
+    if (a.fee === 'no')           { scores.cashback += 2; scores.cashback_cat += 1; scores.premium -= 2; scores.travel -= 1; }
+
+    Object.keys(scores).forEach(k => { if (scores[k] < 0) scores[k] = 0; });
+    return Object.keys(scores).reduce((a, b) => scores[a] >= scores[b] ? a : b);
+  }
 
   let current = 0;
   let answers = {};
