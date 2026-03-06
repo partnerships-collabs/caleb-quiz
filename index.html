@@ -544,6 +544,35 @@
     }
     .hidden { display: none !important; }
 
+    /* Powered by MoneyMatchup footer */
+    .powered-by {
+      text-align: center;
+      padding: 24px 20px 40px;
+      margin-top: 8px;
+    }
+    .powered-by a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #E03A3A;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      opacity: 0.75;
+      transition: opacity 0.15s;
+    }
+    .powered-by a:hover { opacity: 1; }
+    .powered-by a::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #E03A3A;
+      flex-shrink: 0;
+    }
+
     @media (max-width: 480px) {
       .page { padding: 32px 16px 60px; }
       .hero h1 { font-size: 2rem; }
@@ -915,5 +944,10 @@
 
   render('forward');
 </script>
+
+<footer class="powered-by">
+  <a href="https://moneymatchup.com" target="_blank" rel="noopener">Powered by MoneyMatchup</a>
+</footer>
+
 </body>
 </html>
