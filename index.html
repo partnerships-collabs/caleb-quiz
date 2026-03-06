@@ -395,35 +395,7 @@
       font-weight: 600;
       letter-spacing: 0.02em;
     }
-    .result-headline {
-      font-size: 1.05rem;
-      color: var(--muted);
-      line-height: 1.6;
-      max-width: 440px;
-      margin: 16px auto 0;
-    }
-    .btn-cta {
-      display: block;
-      width: 100%;
-      background: var(--lime);
-      border: none;
-      color: var(--lime-text);
-      padding: 18px;
-      border-radius: 12px;
-      font-size: 1.05rem;
-      font-family: 'Inter Tight', sans-serif;
-      font-weight: 800;
-      cursor: pointer;
-      letter-spacing: -0.01em;
-      margin-bottom: 12px;
-      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-    }
-    .btn-cta:hover {
-      background: #eeff1a;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(225,253,12,0.3);
-    }
-    .btn-cta:active { transform: translateY(0); }
+
 
     /* Caleb's take */
     .caleb-take {
@@ -639,10 +611,21 @@
       <div><div class="result-badge">Your Match</div></div>
       <div class="result-card-name" id="res-name"></div>
       <div class="result-card-type" id="res-type"></div>
-      <div class="result-headline" id="res-headline"></div>
     </div>
-    <button class="btn-cta" id="btn-cta" onclick="doRedirect()">See my card →</button>
-    <button class="btn-restart" onclick="restart()">Start over</button>
+
+    <div class="caleb-take">
+      <div class="caleb-take-header">
+        <img src="caleb.jpg" alt="Caleb" />
+        <span class="caleb-take-name">Caleb's Take</span>
+      </div>
+      <p id="res-message"></p>
+    </div>
+
+    <div style="text-align:center; margin-top: 24px;">
+      <div id="redirect-status" style="font-size:0.85rem; color:var(--muted);">Taking you there now...</div>
+    </div>
+
+    <button class="btn-restart" onclick="restart()" style="margin-top:20px;">Start over</button>
   </div>
 
 </div>
@@ -653,29 +636,27 @@
     balance_transfer: {
       name: 'Balance Transfer Card',
       type: 'Pay Off Your Debt Faster',
-      headline: 'Up to 21 months at 0% APR — your runway to eliminate high-interest debt for good.'
     },
     business: {
       name: 'Business Rewards Card',
       type: 'Built for Business Owners',
-      headline: 'Earn 3x points on the expenses your business already has — travel, ads, phone, and internet.'
     },
     everyday: {
       name: 'Everyday Rewards Card',
       type: 'Simple, No-Nonsense Cashback',
-      headline: 'Earn cashback on every purchase with no categories to track and no annual fee.'
     },
     travel: {
       name: 'Travel Rewards Card',
       type: 'Entry-Level Travel Card',
-      headline: 'Earn points on flights and hotels you were already booking — with solid transfer partners.'
     },
     premium_travel: {
       name: 'Premium Travel Card',
       type: 'For Serious Travelers',
-      headline: 'Lounge access, travel credits, and top-tier rewards that justify every dollar of the annual fee.'
     }
   };
+
+  // Creator voice message shown on the redirect screen (customizable per skin)
+  const REDIRECT_MESSAGE = "Whatever card you're about to see — I don't care how excited you are about the rewards. If you carry a balance, the bank wins and you lose. Pay it off in full. Every month. No exceptions. No excuses. That's the only way any of this works in your favor.";
 
   // Redirect URLs for each outcome (5 total)
   const REDIRECT_URLS = {
@@ -1051,6 +1032,7 @@
 
   let _redirectUrl = '';
   let _currentOutcome = '';
+  let _redirectTimer = null;
 
   function showResult() {
     const cardKey = getCard(answers);
@@ -1061,7 +1043,7 @@
     const display = RESULT_DISPLAY[_currentOutcome];
     document.getElementById('res-name').textContent = display.name;
     document.getElementById('res-type').textContent = display.type;
-    document.getElementById('res-headline').textContent = display.headline;
+    document.getElementById('res-message').textContent = REDIRECT_MESSAGE;
 
     // GA4: track quiz completion
     if (typeof gtag !== 'undefined') {
@@ -1071,18 +1053,20 @@
     document.getElementById('quiz-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
 
-  function doRedirect() {
-    // GA4: track CTA click
-    if (typeof gtag !== 'undefined') {
-      gtag('event', 'cta_click', { outcome: _currentOutcome });
-    }
-    window.location.href = _redirectUrl;
+    // Auto-redirect after 3.5s
+    if (_redirectTimer) clearTimeout(_redirectTimer);
+    _redirectTimer = setTimeout(() => {
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'redirect', { outcome: _currentOutcome });
+      }
+      window.location.href = _redirectUrl;
+    }, 3500);
   }
 
   function restart() {
     if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
+    if (_redirectTimer) { clearTimeout(_redirectTimer); _redirectTimer = null; }
     current = 0;
     answers = {};
     selected = null;
