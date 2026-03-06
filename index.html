@@ -9,6 +9,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- GA4: replace G-XXXXXXXXXX with your Measurement ID -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
   <style>
     :root {
       --lime: #e1fd0c;
@@ -387,6 +395,35 @@
       font-weight: 600;
       letter-spacing: 0.02em;
     }
+    .result-headline {
+      font-size: 1.05rem;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 440px;
+      margin: 16px auto 0;
+    }
+    .btn-cta {
+      display: block;
+      width: 100%;
+      background: var(--lime);
+      border: none;
+      color: var(--lime-text);
+      padding: 18px;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    }
+    .btn-cta:hover {
+      background: #eeff1a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(225,253,12,0.3);
+    }
+    .btn-cta:active { transform: translateY(0); }
 
     /* Caleb's take */
     .caleb-take {
@@ -595,18 +632,51 @@
     </div>
   </div>
 
-  <!-- RESULT SCREEN (redirecting state) -->
+  <!-- RESULT SCREEN -->
   <div id="result-screen" class="hidden">
-    <div style="text-align:center; padding: 80px 20px;">
-      <img src="caleb.jpg" alt="Caleb Hammer" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2.5px solid var(--lime);margin-bottom:24px;display:block;margin-left:auto;margin-right:auto;" />
-      <div style="font-family:'Inter Tight',sans-serif;font-weight:800;font-size:1.6rem;color:var(--white);letter-spacing:-0.03em;margin-bottom:10px;">Finding your card...</div>
-      <div style="font-size:0.92rem;color:var(--muted);">Taking you to your recommendation now.</div>
+    <div class="result-hero">
+      <img src="caleb.jpg" alt="Caleb Hammer" class="result-photo" />
+      <div><div class="result-badge">Your Match</div></div>
+      <div class="result-card-name" id="res-name"></div>
+      <div class="result-card-type" id="res-type"></div>
+      <div class="result-headline" id="res-headline"></div>
     </div>
+    <button class="btn-cta" id="btn-cta" onclick="doRedirect()">See my card →</button>
+    <button class="btn-restart" onclick="restart()">Start over</button>
   </div>
 
 </div>
 
 <script>
+  // Result preview display data for each outcome
+  const RESULT_DISPLAY = {
+    balance_transfer: {
+      name: 'Balance Transfer Card',
+      type: 'Pay Off Your Debt Faster',
+      headline: 'Up to 21 months at 0% APR — your runway to eliminate high-interest debt for good.'
+    },
+    business: {
+      name: 'Business Rewards Card',
+      type: 'Built for Business Owners',
+      headline: 'Earn 3x points on the expenses your business already has — travel, ads, phone, and internet.'
+    },
+    everyday: {
+      name: 'Everyday Rewards Card',
+      type: 'Simple, No-Nonsense Cashback',
+      headline: 'Earn cashback on every purchase with no categories to track and no annual fee.'
+    },
+    travel: {
+      name: 'Travel Rewards Card',
+      type: 'Entry-Level Travel Card',
+      headline: 'Earn points on flights and hotels you were already booking — with solid transfer partners.'
+    },
+    premium_travel: {
+      name: 'Premium Travel Card',
+      type: 'For Serious Travelers',
+      headline: 'Lounge access, travel credits, and top-tier rewards that justify every dollar of the annual fee.'
+    }
+  };
+
   // Redirect URLs for each outcome (5 total)
   const REDIRECT_URLS = {
     business:         'https://oc.brcclx.com/t?lid=26770735',
@@ -669,16 +739,6 @@
         { label: "Earn travel rewards, points, or miles", value: 'travel' },
         { label: "Get cashback on everyday purchases", value: 'cashback' },
         { label: "Build or improve my credit score", value: 'build' }
-      ]
-    },
-    {
-      id: 'spending',
-      text: "Where do you spend the most?",
-      options: [
-        { label: "Flights, hotels, and travel", value: 'travel' },
-        { label: "Gas, groceries, and dining", value: 'everyday' },
-        { label: "A mix of everything", value: 'everything' },
-        { label: "Mostly bills and fixed expenses", value: 'bills' }
       ]
     },
     {
@@ -871,17 +931,29 @@
     if (a.goal === 'travel')   { scores.travel += 3; scores.premium += 1; }
     if (a.goal === 'cashback') { scores.cashback += 3; scores.cashback_cat += 2; }
 
-    if (a.spending === 'travel')     { scores.travel += 3; scores.premium += 2; }
-    if (a.spending === 'everyday')   { scores.cashback_cat += 3; scores.cashback += 2; }
-    if (a.spending === 'everything') { scores.cashback += 3; }
-    if (a.spending === 'bills')      { scores.cashback += 1; }
-
     if (a.fee === 'premium-yes')  { scores.premium += 4; scores.travel += 1; }
     if (a.fee === 'cashback-yes') { scores.cashback += 2; scores.cashback_cat += 1; }
     if (a.fee === 'no')           { scores.cashback += 2; scores.cashback_cat += 1; scores.premium -= 2; scores.travel -= 1; }
 
     Object.keys(scores).forEach(k => { if (scores[k] < 0) scores[k] = 0; });
-    return Object.keys(scores).reduce((a, b) => scores[a] >= scores[b] ? a : b);
+
+    // Premium only wins ties when they explicitly opted in to a premium fee
+    const tiePriority = {
+      premium:     a.fee === 'premium-yes' ? 5 : 1,
+      travel:      4,
+      cashback_cat:3,
+      cashback:    2,
+      secured:1, fizz:1, student:1, transfer:1
+    };
+    const result = Object.keys(scores).sort((a, b) => {
+      if (scores[b] !== scores[a]) return scores[b] - scores[a];
+      return (tiePriority[b] || 0) - (tiePriority[a] || 0);
+    })[0];
+
+    // Fair credit can't qualify for travel cards — route to everyday instead
+    if ((result === 'travel' || result === 'premium') && a.score === 'fair') return 'cashback';
+
+    return result;
   }
 
   let current = 0;
@@ -977,17 +1049,36 @@
     }
   }
 
+  let _redirectUrl = '';
+  let _currentOutcome = '';
+
   function showResult() {
     const cardKey = getCard(answers);
-    const outcome = OUTCOME_MAP[cardKey] || 'everyday';
-    const baseUrl = REDIRECT_URLS[outcome];
-    const url = _slug ? baseUrl + '&s1=' + encodeURIComponent(_slug) : baseUrl;
+    _currentOutcome = OUTCOME_MAP[cardKey] || 'everyday';
+    const baseUrl = REDIRECT_URLS[_currentOutcome];
+    _redirectUrl = _slug ? baseUrl + '&s1=' + encodeURIComponent(_slug) : baseUrl;
+
+    const display = RESULT_DISPLAY[_currentOutcome];
+    document.getElementById('res-name').textContent = display.name;
+    document.getElementById('res-type').textContent = display.type;
+    document.getElementById('res-headline').textContent = display.headline;
+
+    // GA4: track quiz completion
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'quiz_complete', { outcome: _currentOutcome });
+    }
 
     document.getElementById('quiz-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
-    window.location.href = url;
+  function doRedirect() {
+    // GA4: track CTA click
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'cta_click', { outcome: _currentOutcome });
+    }
+    window.location.href = _redirectUrl;
   }
 
   function restart() {
