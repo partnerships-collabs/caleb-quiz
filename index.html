@@ -629,8 +629,9 @@
     premium:     'premium_travel'
   };
 
-  // SubID from URL slug (e.g. /yt → s1=yt)
-  const _slug = window.location.pathname.replace(/^\//, '').split('/')[0];
+  // SubID from URL slug (e.g. /yt → s1=yt); ignore file extensions
+  const _rawSlug = window.location.pathname.replace(/^\//, '').split('/')[0];
+  const _slug = _rawSlug && !/\.\w+$/.test(_rawSlug) ? _rawSlug : '';
 
   const questions = [
     {
