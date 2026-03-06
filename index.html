@@ -595,40 +595,43 @@
     </div>
   </div>
 
-  <!-- RESULT SCREEN -->
+  <!-- RESULT SCREEN (redirecting state) -->
   <div id="result-screen" class="hidden">
-    <div class="result-hero">
-      <img src="caleb.jpg" alt="Caleb Hammer" class="result-photo" />
-      <div><div class="result-badge">Your Match</div></div>
-      <div class="result-card-name" id="res-name"></div>
-      <div class="result-card-type" id="res-type"></div>
+    <div style="text-align:center; padding: 80px 20px;">
+      <img src="caleb.jpg" alt="Caleb Hammer" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2.5px solid var(--lime);margin-bottom:24px;display:block;margin-left:auto;margin-right:auto;" />
+      <div style="font-family:'Inter Tight',sans-serif;font-weight:800;font-size:1.6rem;color:var(--white);letter-spacing:-0.03em;margin-bottom:10px;">Finding your card...</div>
+      <div style="font-size:0.92rem;color:var(--muted);">Taking you to your recommendation now.</div>
     </div>
-
-    <div class="caleb-take">
-      <div class="caleb-take-header">
-        <img src="caleb.jpg" alt="Caleb" />
-        <span class="caleb-take-name">Caleb's Take</span>
-      </div>
-      <p id="res-take"></p>
-    </div>
-
-    <div class="info-grid">
-      <div class="info-card">
-        <h3>Why it fits you</h3>
-        <ul id="res-reasons"></ul>
-      </div>
-      <div class="info-card">
-        <h3>Before you apply</h3>
-        <ul id="res-notes"></ul>
-      </div>
-    </div>
-
-    <button class="btn-restart" onclick="restart()">Start over</button>
   </div>
 
 </div>
 
 <script>
+  // Redirect URLs for each outcome (5 total)
+  const REDIRECT_URLS = {
+    business:         'https://oc.brcclx.com/t?lid=26770735',
+    transfer:         'https://oc.brcclx.com/t?lid=26770731',
+    everyday:         'https://oc.brcclx.com/t?lid=26770732',
+    travel:           'https://oc.brcclx.com/t?lid=26770733',
+    premium_travel:   'https://oc.brcclx.com/t?lid=26770734'
+  };
+
+  // Map old card keys → 5 outcome buckets
+  const OUTCOME_MAP = {
+    business:    'business',
+    transfer:    'transfer',
+    secured:     'everyday',
+    student:     'everyday',
+    fizz:        'everyday',
+    cashback:    'everyday',
+    cashback_cat:'everyday',
+    travel:      'travel',
+    premium:     'premium_travel'
+  };
+
+  // SubID from URL slug (e.g. /yt → s1=yt)
+  const _slug = window.location.pathname.replace(/^\//, '').split('/')[0];
+
   const questions = [
     {
       id: 'cardtype',
@@ -974,18 +977,16 @@
   }
 
   function showResult() {
-    const key = getCard(answers);
-    const card = cards[key];
-
-    document.getElementById('res-name').textContent = card.name;
-    document.getElementById('res-type').textContent = card.type;
-    document.getElementById('res-take').textContent = card.take;
-    document.getElementById('res-reasons').innerHTML = card.reasons.map(r => `<li>${r}</li>`).join('');
-    document.getElementById('res-notes').innerHTML = card.notes.map(n => `<li>${n}</li>`).join('');
+    const cardKey = getCard(answers);
+    const outcome = OUTCOME_MAP[cardKey] || 'everyday';
+    const baseUrl = REDIRECT_URLS[outcome];
+    const url = _slug ? baseUrl + '&s1=' + encodeURIComponent(_slug) : baseUrl;
 
     document.getElementById('quiz-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    window.location.href = url;
   }
 
   function restart() {
