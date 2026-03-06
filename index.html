@@ -586,10 +586,10 @@
 <body>
 
 <header class="header">
-  <img src="photo.jpg" alt="Caleb Hammer" />
+  <img id="creator-photo-header" src="photo.jpg" alt="Caleb Hammer" />
   <div>
-    <div class="header-name">Caleb Hammer</div>
-    <div class="header-tag">Financial Audit</div>
+    <div class="header-name" id="creator-name-header">Caleb Hammer</div>
+    <div class="header-tag" id="creator-tagline-header">Financial Audit</div>
   </div>
 </header>
 
@@ -598,7 +598,7 @@
   <!-- QUIZ SCREEN -->
   <div id="quiz-screen">
     <div class="hero">
-      <img src="photo.jpg" alt="Caleb Hammer" class="hero-photo" />
+      <img id="creator-photo-hero" src="photo.jpg" alt="Caleb Hammer" class="hero-photo" />
       <div class="hero-copy">
         <h1>Find Your <span>Perfect</span> Credit Card</h1>
         <p>Five questions. No fluff. Get a card recommendation based on your actual financial situation.</p>
@@ -627,7 +627,7 @@
   <!-- RESULT SCREEN -->
   <div id="result-screen" class="hidden">
     <div class="result-hero">
-      <img src="photo.jpg" alt="Caleb Hammer" class="result-photo" />
+      <img id="creator-photo-result" src="photo.jpg" alt="Caleb Hammer" class="result-photo" />
       <div><div class="result-badge">Your Match</div></div>
       <div class="result-card-name" id="res-name"></div>
       <div class="result-card-type" id="res-type"></div>
@@ -635,8 +635,8 @@
 
     <div class="caleb-take">
       <div class="caleb-take-header">
-        <img src="photo.jpg" alt="Caleb Hammer" />
-        <span class="caleb-take-name">Caleb's Take</span>
+        <img id="creator-photo-take" src="photo.jpg" alt="Caleb Hammer" />
+        <span class="caleb-take-name" id="creator-take-label">Caleb's Take</span>
       </div>
       <p id="res-message"></p>
     </div>
@@ -682,7 +682,9 @@
   },
   "redirectMessage": "Pay it off. Every month. Full balance. I don't care how good the rewards look. Carrying a balance means you are paying interest that wipes out every single point you earned and then some. The card is a tool, not a loan. Treat it like one.",
   "subIdParam": "s1",
-  "ga4Id": ""
+  "ga4Id": "",
+  "multiCreator": false,
+  "creatorConfigs": {}
 };
   const REDIRECT_URLS = SKIN.redirectUrls;
   const RESULT_DISPLAY = SKIN.resultDisplay;
@@ -702,9 +704,49 @@
     premium:      'premium_travel'
   };
 
-  // SubID from URL slug (e.g. /yt -> s1=yt); ignore file extensions
-  const _rawSlug = window.location.pathname.replace(/^\//, '').split('/')[0];
-  const _slug = _rawSlug && !/\.\w+$/.test(_rawSlug) ? _rawSlug : '';
+  // Path parsing -- supports single-creator (/yt) and multi-creator (/caleb/yt)
+  const _pathParts = window.location.pathname.replace(/^\//, '').split('/')
+    .filter(s => s && !/\.\w+$/.test(s));
+
+  let _creatorSlug = '';
+  let _subIdSlug   = '';
+
+  if (SKIN.multiCreator) {
+    _creatorSlug = _pathParts[0] || '';
+    _subIdSlug   = _pathParts[1] || '';
+  } else {
+    _subIdSlug = _pathParts[0] || '';
+  }
+
+  // Resolve active config: creator override if slug matches, otherwise default
+  const _creatorConfig = (SKIN.multiCreator && _creatorSlug && SKIN.creatorConfigs && SKIN.creatorConfigs[_creatorSlug])
+    ? SKIN.creatorConfigs[_creatorSlug]
+    : null;
+
+  const _activeUrls    = (_creatorConfig && _creatorConfig.redirectUrls)    || REDIRECT_URLS;
+  const _activeDisplay = (_creatorConfig && _creatorConfig.resultDisplay)   || RESULT_DISPLAY;
+  const _activeMessage = (_creatorConfig && _creatorConfig.redirectMessage) || REDIRECT_MESSAGE;
+
+  // Apply creator branding to DOM
+  function applyCreatorConfig(cfg) {
+    if (!cfg) return;
+    const name     = cfg.creatorName    || SKIN.creatorName;
+    const photo    = cfg.creatorPhoto   || SKIN.creatorPhoto;
+    const tagline  = cfg.creatorTagline || SKIN.creatorTagline;
+    const label    = cfg.voiceLabel     || SKIN.voiceLabel;
+    ['creator-photo-header','creator-photo-hero','creator-photo-result','creator-photo-take'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) { el.src = photo; el.alt = name; }
+    });
+    var nameEl    = document.getElementById('creator-name-header');
+    var tagEl     = document.getElementById('creator-tagline-header');
+    var labelEl   = document.getElementById('creator-take-label');
+    if (nameEl)  nameEl.textContent  = name;
+    if (tagEl)   tagEl.textContent   = tagline;
+    if (labelEl) labelEl.textContent = label;
+  }
+
+  applyCreatorConfig(_creatorConfig);
 
   const questions = [
     {
@@ -903,13 +945,13 @@
   function showResult() {
     const cardKey = getCard(answers);
     _currentOutcome = OUTCOME_MAP[cardKey] || 'everyday';
-    const baseUrl = REDIRECT_URLS[_currentOutcome];
-    _redirectUrl = _slug ? baseUrl + '&' + _subIdParam + '=' + encodeURIComponent(_slug) : baseUrl;
+    const baseUrl = _activeUrls[_currentOutcome];
+    _redirectUrl = _subIdSlug ? baseUrl + '&' + _subIdParam + '=' + encodeURIComponent(_subIdSlug) : baseUrl;
 
-    const display = RESULT_DISPLAY[_currentOutcome];
+    const display = _activeDisplay[_currentOutcome];
     document.getElementById('res-name').textContent = display.name;
     document.getElementById('res-type').textContent = display.type;
-    document.getElementById('res-message').textContent = REDIRECT_MESSAGE;
+    document.getElementById('res-message').textContent = _activeMessage;
 
     // GA4: track quiz completion
     if (SKIN.ga4Id && typeof gtag !== 'undefined') {
