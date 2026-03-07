@@ -12,9 +12,10 @@
 
   <style>
     :root {
-      --accent:          #3a4f00;
-      --accent-text:     #ffffff;
-      --accent-rgb:      58, 79, 0;
+      --accent:          #e1fd0c;
+      --accent-text:     #3a4f00;
+      --accent-rgb:      225, 253, 12;
+      --label:           #3a4f00;
             --green: #1a9e1a;
       --dark: #ffffff;
       --dark2: #f8f8f8;
@@ -69,7 +70,7 @@
     }
     .header-tag {
       font-size: 0.72rem;
-      color: var(--accent);
+      color: var(--label);
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -166,7 +167,7 @@
     .step-dot.done {
       background: rgba(var(--accent-rgb), 0.1);
       border-color: var(--accent);
-      color: var(--accent);
+      color: var(--label);
     }
     .step-line {
       height: 2px;
@@ -204,7 +205,7 @@
 
     .q-number {
       font-size: 0.72rem;
-      color: var(--accent);
+      color: var(--label);
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.12em;
@@ -356,7 +357,7 @@
       gap: 6px;
       background: rgba(var(--accent-rgb), 0.1);
       border: 1px solid rgba(var(--accent-rgb), 0.35);
-      color: var(--accent);
+      color: var(--label);
       font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.12em;
@@ -384,7 +385,7 @@
     }
     .result-card-type {
       font-size: 0.9rem;
-      color: var(--accent);
+      color: var(--label);
       font-weight: 600;
       letter-spacing: 0.02em;
     }
@@ -414,7 +415,7 @@
       font-family: 'Inter Tight', sans-serif;
       font-weight: 700;
       font-size: 0.82rem;
-      color: var(--accent);
+      color: var(--label);
       letter-spacing: 0.02em;
     }
     .caleb-take p {
@@ -445,7 +446,7 @@
       font-family: 'Inter Tight', sans-serif;
       font-weight: 700;
       font-size: 0.82rem;
-      color: var(--accent);
+      color: var(--label);
       text-transform: uppercase;
       letter-spacing: 0.1em;
       margin-bottom: 14px;
@@ -465,7 +466,7 @@
     }
     .info-card ul li::before {
       content: '+';
-      color: var(--accent);
+      color: var(--label);
       position: absolute;
       left: 0;
       font-weight: 800;
@@ -504,9 +505,9 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(var(--accent-rgb), 0.1);
-      border: 1px solid rgba(var(--accent-rgb), 0.35);
-      color: var(--accent);
+      background: var(--accent);
+      border: 1px solid var(--accent);
+      color: var(--accent-text);
       font-size: 0.78rem;
       font-weight: 600;
       padding: 5px 12px;
@@ -518,7 +519,7 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--accent);
+      background: var(--accent-text);
       flex-shrink: 0;
     }
     @media (min-width: 600px) {
@@ -865,6 +866,7 @@
     inner.className = dir === 'back' ? 'q-slide-back' : 'q-slide';
     void inner.offsetWidth;
 
+    document.getElementById('q-number').textContent = 'Question ' + (current + 1);
     document.getElementById('q-text').textContent = q.text;
 
     const optionsEl = document.getElementById('q-options');
