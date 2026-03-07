@@ -8,6 +8,7 @@ module.exports = {
   accentColor:    '#e1fd0c',
   accentText:     '#3a4f00',
   accentRgb:      '225, 253, 12',
+  accentOnWhite:  '#3a4f00',  // readable accent text on white backgrounds
 
   // Hero copy
   heroH1:      ['Find Your ', 'Perfect', ' Credit Card'],
