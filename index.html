@@ -505,9 +505,9 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: var(--accent);
-      border: 1px solid var(--accent);
-      color: var(--accent-text);
+      background: rgba(var(--accent-rgb), 0.1);
+      border: 1px solid rgba(var(--accent-rgb), 0.35);
+      color: var(--accent-on-white);
       font-size: 0.78rem;
       font-weight: 600;
       padding: 5px 12px;
@@ -519,7 +519,7 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--accent-text);
+      background: var(--accent-on-white);
       flex-shrink: 0;
     }
     @media (min-width: 600px) {
