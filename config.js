@@ -5,10 +5,9 @@ module.exports = {
   creatorName:    'Caleb Hammer',
   creatorTagline: 'Financial Audit',
   creatorPhoto:   'photo.jpg',
-  accentColor:    '#e1fd0c',
-  accentText:     '#3a4f00',
-  accentRgb:      '225, 253, 12',
-  accentOnWhite:  '#3a4f00',  // readable accent text on white backgrounds
+  accentColor:    '#3a4f00',
+  accentText:     '#ffffff',
+  accentRgb:      '58, 79, 0',
 
   // Hero copy
   heroH1:      ['Find Your ', 'Perfect', ' Credit Card'],
