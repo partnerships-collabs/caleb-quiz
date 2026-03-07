@@ -20,7 +20,7 @@ module.exports = {
   redirectMessage: "Pay it off. Every month. Full balance. I don't care how good the rewards look. Carrying a balance means you are paying interest that wipes out every single point you earned and then some. The card is a tool, not a loan. Treat it like one.",
 
   // Tracking
-  ga4Id:      '',   // e.g. 'G-XXXXXXXXXX'
+  ga4Id:      'G-3G6NZ5CL5Q',
   subIdParam: 's1',
 
   // Affiliate redirect URLs
