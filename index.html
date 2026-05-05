@@ -756,6 +756,31 @@
 
   applyCreatorConfig(_creatorConfig);
 
+  // Affiliate slug resolution (mirrors moneymatchup-quiz behaviour)
+  const _AFFILIATE_API_URL   = 'https://partners.moneymatchup.com';
+  const _QUIZ_SHARED_SECRET  = '28abb2c9379d6cd88bf004bc17db3bb56a93134fafbbb04a2a334fbb5b8e9b2a';
+  const _ROUTER_BASE         = 'https://secure.moneymatchup.com';
+
+  // MM-quiz OfferProvider baseUrls — used as keys in the resolve-links response
+  const _AFFILIATE_BASE_URLS = {
+    business:      'https://oc.brcclx.com/t?lid=26770741',
+    transfer:      'https://oc.brcclx.com/t?lid=26770737',
+    everyday:      'https://oc.brcclx.com/t?lid=26770739',
+    travel:        'https://oc.brcclx.com/t?lid=26770738',
+    premium_travel:'https://oc.brcclx.com/t?lid=26770740',
+  };
+
+  // Fetch child-slug map from affiliate platform; resolved before quiz completes
+  let _affiliateSlugMap = null;
+  const _slugMapReady = _subIdSlug
+    ? fetch(_AFFILIATE_API_URL + '/api/quiz/resolve-links?parentSlug=' + encodeURIComponent(_subIdSlug), {
+        headers: { 'Authorization': 'Bearer ' + _QUIZ_SHARED_SECRET }
+      })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data && typeof data === 'object') _affiliateSlugMap = data; })
+      .catch(() => {})
+    : Promise.resolve();
+
   const questions = [
     {
       id: 'cardtype',
@@ -954,8 +979,15 @@
   function showResult() {
     const cardKey = getCard(answers);
     _currentOutcome = OUTCOME_MAP[cardKey] || 'everyday';
-    const baseUrl = _activeUrls[_currentOutcome];
-    _redirectUrl = _subIdSlug ? baseUrl + '&' + _subIdParam + '=' + encodeURIComponent(_subIdSlug) : baseUrl;
+
+    const affiliateBase = _AFFILIATE_BASE_URLS[_currentOutcome];
+    const childSlug = _affiliateSlugMap && affiliateBase && _affiliateSlugMap[affiliateBase];
+    if (childSlug) {
+      _redirectUrl = _ROUTER_BASE + '/' + childSlug;
+    } else {
+      const baseUrl = _activeUrls[_currentOutcome];
+      _redirectUrl = _subIdSlug ? baseUrl + '&' + _subIdParam + '=' + encodeURIComponent(_subIdSlug) : baseUrl;
+    }
 
     const display = _activeDisplay[_currentOutcome];
     document.getElementById('res-name').textContent = display.name;
