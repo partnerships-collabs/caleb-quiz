@@ -691,6 +691,18 @@
   "redirectMessage": "Pay it off. Every month. Full balance. I don't care how good the rewards look. Carrying a balance means you are paying interest that wipes out every single point you earned and then some. The card is a tool, not a loan. Treat it like one.",
   "subIdParam": "s1",
   "ga4Id": "G-3G6NZ5CL5Q",
+  "analyticsEndpoint": "https://partners.moneymatchup.com/api/quiz/submissions",
+  "quizSlug": "caleb-hammer",
+  "creatorSlug": "caleb-hammer",
+  "affiliateApiUrl": "https://partners.moneymatchup.com",
+  "routerBaseUrl": "https://secure.moneymatchup.com",
+  "affiliateBaseUrls": {
+    "balance_transfer": "https://oc.brcclx.com/t?lid=26770737",
+    "business": "https://oc.brcclx.com/t?lid=26770741",
+    "everyday": "https://oc.brcclx.com/t?lid=26770739",
+    "travel": "https://oc.brcclx.com/t?lid=26770738",
+    "premium_travel": "https://oc.brcclx.com/t?lid=26770740"
+  },
   "multiCreator": false,
   "creatorConfigs": {}
 };
@@ -726,6 +738,11 @@
     _subIdSlug = _pathParts[0] || '';
   }
 
+  const _urlParams = new URLSearchParams(window.location.search);
+  const _querySubId = _urlParams.get(_subIdParam) || _urlParams.get('s1') || '';
+  const _queryS2 = _urlParams.get('s2') || '';
+  if (!_subIdSlug && _querySubId) _subIdSlug = _querySubId;
+
   // Resolve active config: creator override if slug matches, otherwise default
   const _creatorConfig = (SKIN.multiCreator && _creatorSlug && SKIN.creatorConfigs && SKIN.creatorConfigs[_creatorSlug])
     ? SKIN.creatorConfigs[_creatorSlug]
@@ -756,30 +773,77 @@
 
   applyCreatorConfig(_creatorConfig);
 
-  // Affiliate slug resolution (mirrors moneymatchup-quiz behaviour)
-  const _AFFILIATE_API_URL   = 'https://partners.moneymatchup.com';
-  const _QUIZ_SHARED_SECRET  = '28abb2c9379d6cd88bf004bc17db3bb56a93134fafbbb04a2a334fbb5b8e9b2a';
-  const _ROUTER_BASE         = 'https://secure.moneymatchup.com';
+  const _analyticsEndpoint = SKIN.analyticsEndpoint || '';
+  const _quizSlug = SKIN.quizSlug || 'credit-card-quiz';
+  const _resolvedCreatorSlug = SKIN.creatorSlug || _creatorSlug || _quizSlug;
+  const _affiliateApiUrl = SKIN.affiliateApiUrl || '';
+  const _routerBaseUrl = SKIN.routerBaseUrl || '';
+  const _affiliateBaseUrls = SKIN.affiliateBaseUrls || {};
 
-  // MM-quiz OfferProvider baseUrls — used as keys in the resolve-links response
-  const _AFFILIATE_BASE_URLS = {
-    business:      'https://oc.brcclx.com/t?lid=26770741',
-    transfer:      'https://oc.brcclx.com/t?lid=26770737',
-    everyday:      'https://oc.brcclx.com/t?lid=26770739',
-    travel:        'https://oc.brcclx.com/t?lid=26770738',
-    premium_travel:'https://oc.brcclx.com/t?lid=26770740',
-  };
-
-  // Fetch child-slug map from affiliate platform; resolved before quiz completes
   let _affiliateSlugMap = null;
-  const _slugMapReady = _subIdSlug
-    ? fetch(_AFFILIATE_API_URL + '/api/quiz/resolve-links?parentSlug=' + encodeURIComponent(_subIdSlug), {
-        headers: { 'Authorization': 'Bearer ' + _QUIZ_SHARED_SECRET }
-      })
+  const _slugMapReady = (_subIdSlug && _affiliateApiUrl)
+    ? fetch(_affiliateApiUrl + '/api/quiz/resolve-public?parentSlug=' + encodeURIComponent(_subIdSlug))
       .then(r => r.ok ? r.json() : null)
       .then(data => { if (data && typeof data === 'object') _affiliateSlugMap = data; })
       .catch(() => {})
     : Promise.resolve();
+
+  function quizSessionId() {
+    const key = 'cc_quiz_session_id';
+    try {
+      let id = localStorage.getItem(key);
+      if (!id) {
+        id = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : String(Date.now()) + '-' + Math.random().toString(36).slice(2);
+        localStorage.setItem(key, id);
+      }
+      return id;
+    } catch (_) {
+      return String(Date.now()) + '-' + Math.random().toString(36).slice(2);
+    }
+  }
+
+  function withSubId(baseUrl) {
+    if (!_subIdSlug) return baseUrl;
+    const sep = baseUrl.includes('?') ? '&' : '?';
+    return baseUrl + sep + _subIdParam + '=' + encodeURIComponent(_subIdSlug);
+  }
+
+  function resolveRedirectUrl() {
+    const affiliateBase = _affiliateBaseUrls[_currentOutcome];
+    const childSlug = _affiliateSlugMap && affiliateBase && _affiliateSlugMap[affiliateBase];
+    if (childSlug && _routerBaseUrl) {
+      return _routerBaseUrl.replace(/\/$/, '') + '/' + childSlug;
+    }
+
+    return withSubId(_activeUrls[_currentOutcome] || window.location.href);
+  }
+
+  function sendQuizSubmission(cardKey) {
+    if (!_analyticsEndpoint) return;
+
+    const payload = {
+      quizSlug: _quizSlug,
+      creatorSlug: _resolvedCreatorSlug,
+      sessionId: quizSessionId(),
+      source: _queryS2 || _subIdSlug || '',
+      parentSlug: _subIdSlug || '',
+      subId: _queryS2 || '',
+      outcome: _currentOutcome,
+      cardKey,
+      answers: Object.assign({}, answers),
+      path: window.location.pathname + window.location.search,
+      referrer: document.referrer || '',
+    };
+
+    try {
+      fetch(_analyticsEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      }).catch(() => {});
+    } catch (_) {}
+  }
 
   const questions = [
     {
@@ -979,15 +1043,7 @@
   function showResult() {
     const cardKey = getCard(answers);
     _currentOutcome = OUTCOME_MAP[cardKey] || 'everyday';
-
-    const affiliateBase = _AFFILIATE_BASE_URLS[_currentOutcome];
-    const childSlug = _affiliateSlugMap && affiliateBase && _affiliateSlugMap[affiliateBase];
-    if (childSlug) {
-      _redirectUrl = _ROUTER_BASE + '/' + childSlug;
-    } else {
-      const baseUrl = _activeUrls[_currentOutcome];
-      _redirectUrl = _subIdSlug ? baseUrl + '&' + _subIdParam + '=' + encodeURIComponent(_subIdSlug) : baseUrl;
-    }
+    _redirectUrl = resolveRedirectUrl();
 
     const display = _activeDisplay[_currentOutcome];
     document.getElementById('res-name').textContent = display.name;
@@ -996,12 +1052,24 @@
 
     // GA4: track quiz completion
     if (SKIN.ga4Id && typeof gtag !== 'undefined') {
-      gtag('event', 'quiz_complete', { outcome: _currentOutcome });
+      gtag('event', 'quiz_complete', {
+        outcome: _currentOutcome,
+        card_key: cardKey,
+        cardtype: answers.cardtype || '',
+        payoff: answers.payoff || '',
+        score: answers.score || '',
+        goal: answers.goal || '',
+        fee: answers.fee || '',
+      });
     }
+
+    sendQuizSubmission(cardKey);
 
     document.getElementById('quiz-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    _slugMapReady.then(() => { _redirectUrl = resolveRedirectUrl(); });
 
     // Auto-redirect after 3.5s
     if (_redirectTimer) clearTimeout(_redirectTimer);

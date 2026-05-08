@@ -22,6 +22,21 @@ module.exports = {
   // Tracking
   ga4Id:      'G-3G6NZ5CL5Q',
   subIdParam: 's1',
+  analyticsEndpoint: 'https://partners.moneymatchup.com/api/quiz/submissions',
+  quizSlug: 'caleb-hammer',
+  creatorSlug: 'caleb-hammer',
+  affiliateApiUrl: 'https://partners.moneymatchup.com',
+  routerBaseUrl: 'https://secure.moneymatchup.com',
+
+  // OfferProvider base URLs from the Money Matchup quiz app. The affiliate
+  // platform uses these keys to map a quiz outcome to Caleb's child slug.
+  affiliateBaseUrls: {
+    balance_transfer: 'https://oc.brcclx.com/t?lid=26770737',
+    business:         'https://oc.brcclx.com/t?lid=26770741',
+    everyday:         'https://oc.brcclx.com/t?lid=26770739',
+    travel:           'https://oc.brcclx.com/t?lid=26770738',
+    premium_travel:   'https://oc.brcclx.com/t?lid=26770740',
+  },
 
   // Affiliate redirect URLs
   redirectUrls: {
