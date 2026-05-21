@@ -13,11 +13,18 @@ const DIRECT_OFFER_BASE = 'https://oc.brcclx.com/t?lid=26768553';
 const AFFILIATE_API     = 'https://partners.moneymatchup.com';
 const CALLER_ORIGIN     = 'https://cards.calebhammer.com';
 
+// File extensions that are never quiz slugs
+const ASSET_RE = /\.(?:ico|png|jpg|jpeg|svg|webp|js|css|json|txt|woff2?)$/i;
+
 export default async function middleware(request) {
   const url = new URL(request.url);
-  if (url.pathname !== '/') return;
 
-  const s1 = url.searchParams.get('s1');
+  // Skip static asset requests
+  if (ASSET_RE.test(url.pathname)) return;
+
+  // Slug comes from path (/website-resources) or ?s1= query param
+  const pathSlug = url.pathname.replace(/^\//, '').split('/')[0];
+  const s1 = pathSlug || url.searchParams.get('s1');
   if (!s1) return;
 
   const secret = process.env.QUIZ_SHARED_SECRET;
