@@ -25,34 +25,62 @@ export default async function middleware(request) {
   // Slug comes from path (/website-resources) or ?s1= query param
   const pathSlug = url.pathname.replace(/^\//, '').split('/')[0];
   const s1 = pathSlug || url.searchParams.get('s1');
-  if (!s1) return;
+  const dev = url.searchParams.get('dev') === 'true';
+
+  const log = dev
+    ? (...args) => console.log('[caleb-mw]', ...args)
+    : () => {};
+
+  if (!s1) {
+    log('no slug found in path or ?s1= — passing through');
+    return;
+  }
+
+  log(`slug="${s1}" path="${url.pathname}"`);
 
   const secret = process.env.QUIZ_SHARED_SECRET;
-  if (!secret) return; // env not configured — fall through
+  if (!secret) {
+    log('QUIZ_SHARED_SECRET not set — fallback: quiz');
+    return;
+  }
 
   // Resolve child slug map via authed server-side endpoint
   let childSlug = null;
+  let resolveStatus = null;
   try {
     const res = await fetch(
       `${AFFILIATE_API}/api/quiz/resolve-links?parentSlug=${encodeURIComponent(s1)}`,
       { headers: { authorization: `Bearer ${secret}` } }
     );
+    resolveStatus = res.status;
     if (res.ok) {
       const map = await res.json();
       childSlug = map[DIRECT_OFFER_BASE] ?? null;
+      log(`resolve-links status=${res.status} keys=[${Object.keys(map).length}] direct_offer_slug=${childSlug ?? 'not found'}`);
+    } else {
+      const body = await res.text().catch(() => '');
+      log(`resolve-links failed status=${res.status} body="${body.slice(0, 120)}" — fallback: quiz`);
     }
-  } catch {
-    // resolve failed — fall through to quiz
+  } catch (err) {
+    log(`resolve-links threw: ${err?.message ?? err} — fallback: quiz`);
   }
 
   // No direct_offer link for this slug → open quiz normally
-  if (!childSlug) return;
+  if (!childSlug) {
+    log(`no direct_offer child for slug="${s1}" — fallback: quiz`);
+    return;
+  }
 
   // 50/50: pass through to quiz
-  if (Math.random() >= 0.5) return;
+  const roll = Math.random();
+  if (roll >= 0.5) {
+    log(`roll=${roll.toFixed(3)} → quiz`);
+    return;
+  }
 
   // Track + redirect
   const redirectUrl = `${DIRECT_OFFER_BASE}&s1=${encodeURIComponent(childSlug)}`;
+  log(`roll=${roll.toFixed(3)} → redirect to ${redirectUrl}`);
 
   fetch(`${AFFILIATE_API}/api/quiz/submissions`, {
     method: 'POST',
@@ -67,7 +95,9 @@ export default async function middleware(request) {
       path:        url.pathname + url.search,
       referrer:    request.headers.get('referer') ?? '',
     }),
-  }).catch(() => {});
+  }).catch((err) => {
+    log(`analytics POST failed: ${err?.message ?? err}`);
+  });
 
   return Response.redirect(redirectUrl, 302);
 }
