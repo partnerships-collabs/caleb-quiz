@@ -20,15 +20,15 @@ export default async function middleware(request) {
   const s1 = url.searchParams.get('s1');
   if (!s1) return;
 
-  // Resolve child slug map for this parent slug
+  const secret = process.env.QUIZ_SHARED_SECRET;
+  if (!secret) return; // env not configured — fall through
+
+  // Resolve child slug map via authed server-side endpoint
   let childSlug = null;
   try {
     const res = await fetch(
-      `${AFFILIATE_API}/api/quiz/resolve-public?parentSlug=${encodeURIComponent(s1)}`,
-      {
-        headers: { origin: CALLER_ORIGIN },
-        signal: AbortSignal.timeout(3000),
-      }
+      `${AFFILIATE_API}/api/quiz/resolve-links?parentSlug=${encodeURIComponent(s1)}`,
+      { headers: { authorization: `Bearer ${secret}` } }
     );
     if (res.ok) {
       const map = await res.json();
@@ -60,7 +60,6 @@ export default async function middleware(request) {
       path:        url.pathname + url.search,
       referrer:    request.headers.get('referer') ?? '',
     }),
-    signal: AbortSignal.timeout(5000),
   }).catch(() => {});
 
   return Response.redirect(redirectUrl, 302);
