@@ -2,7 +2,7 @@
  * Vercel Edge Function — caleb-hammer quiz entry point
  *
  * Handles all /:slug requests (via vercel.json rewrite).
- * 50/50 split: quiz vs direct-offer redirect.
+ * 100% direct-offer redirect when a direct-offer child slug is available.
  * Load with ?dev=true to see server-side logs in Vercel function logs.
  */
 
@@ -55,15 +55,9 @@ export default async function handler(request) {
     return serveQuiz(url, slug, dev);
   }
 
-  const roll = Math.random();
-  if (roll >= 0.5) {
-    log(`roll=${roll.toFixed(3)} → quiz`);
-    return serveQuiz(url, slug, dev);
-  }
-
-  // Redirect to direct offer
+  // Redirect all eligible traffic to direct offer for now.
   const redirectUrl = `${DIRECT_OFFER_BASE}&s1=${encodeURIComponent(childSlug)}`;
-  log(`roll=${roll.toFixed(3)} → redirect ${redirectUrl}`);
+  log(`redirect → ${redirectUrl}`);
 
   fetch(`${AFFILIATE_API}/api/quiz/submissions`, {
     method: 'POST',
